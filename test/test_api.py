@@ -98,3 +98,25 @@ def test_valid_tablefmt_still_works_after_validation():
     assert "+" in result or "|" in result  # grid has cell separators
     result = tabulate([[1, 2], [3, 4]], tablefmt="simple")
     assert result
+
+
+def test_invalid_tablefmt_none_raises():
+    "API: None as tablefmt raises ValueError"
+    import pytest
+
+    with pytest.raises(ValueError) as exc_info:
+        tabulate([[1, 2]], tablefmt=None)
+
+    error_msg = str(exc_info.value)
+    assert "is not supported" in error_msg
+
+
+def test_invalid_tablefmt_empty_string_raises():
+    "API: empty string as tablefmt raises ValueError"
+    import pytest
+
+    with pytest.raises(ValueError) as exc_info:
+        tabulate([[1, 2]], tablefmt="")
+
+    error_msg = str(exc_info.value)
+    assert "is not supported" in error_msg
