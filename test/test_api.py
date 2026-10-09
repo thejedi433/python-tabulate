@@ -65,3 +65,36 @@ def test_simple_separated_format_signature():
     assert type(simple_separated_format) is type(lambda: None)
     expected_sig = [("separator", _empty)]
     _check_signature(simple_separated_format, expected_sig)
+
+
+def test_invalid_tablefmt_raises():
+    "API: invalid tablefmt raises ValueError with helpful message"
+    import pytest
+
+    with pytest.raises(ValueError) as exc_info:
+        tabulate([[1, 2], [3, 4]], tablefmt="invalid_format")
+
+    error_msg = str(exc_info.value)
+    assert "invalid_format" in error_msg
+    assert "is not supported" in error_msg
+    assert "Allowed values:" in error_msg
+
+
+def test_invalid_tablefmt_lists_available_formats():
+    "API: invalid tablefmt error includes all valid format names"
+    import pytest
+
+    with pytest.raises(ValueError) as exc_info:
+        tabulate([[1, 2]], tablefmt="typo_grid")
+
+    error_msg = str(exc_info.value)
+    assert "simple" in error_msg
+    assert "grid" in error_msg
+
+
+def test_valid_tablefmt_still_works_after_validation():
+    "API: regression test - valid tablefmt values still work after adding validation"
+    result = tabulate([[1, 2], [3, 4]], tablefmt="grid")
+    assert "+" in result or "|" in result  # grid has cell separators
+    result = tabulate([[1, 2], [3, 4]], tablefmt="simple")
+    assert result

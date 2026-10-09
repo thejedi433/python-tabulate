@@ -783,7 +783,8 @@ _multiline_codes_bytes = re.compile(b"\r|\n|\r\n")
 _esc = r"\x1b"
 _csi = rf"{_esc}\["
 _osc = rf"{_esc}\]"
-_st = rf"{_esc}\\"
+# ST: ESC followed by '\' (0x5c), or BEL (0x07) - both are valid OSC terminators
+_st = rf"(?:{_esc}\\|\x07)"
 
 _ansi_escape_pat = rf"""
     (
@@ -2444,7 +2445,12 @@ def tabulate(
         rows = list(zip(*cols))
 
     if not isinstance(tablefmt, TableFormat):
-        tablefmt = _table_formats.get(tablefmt, _table_formats["simple"])
+        if tablefmt not in _table_formats:
+            raise ValueError(
+                f"tablefmt {tablefmt!r} is not supported.\n"
+                f"Allowed values: {list(_table_formats.keys())}"
+            )
+        tablefmt = _table_formats[tablefmt]
 
     ra_default = rowalign if isinstance(rowalign, str) else None
     rowaligns = _expand_iterable(rowalign, len(rows), ra_default)
