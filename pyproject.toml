@@ -66,3 +66,11 @@ max-complexity = 22
 combine-as-imports = true
 force-sort-within-sections = true
 known-local-folder = ["common"]
+
+# Fork-local dev-tooling config.
+# Restrict the universal lock to python >=3.11 so vulnerable filelock 4.1.0
+# (only needed for the <3.11 branch) is pruned; CI uses plain pip and does
+# not read uv.lock, so this is safe. The library's requires-python is
+# unchanged.
+[tool.uv]
+environments = ["python_full_version >= '3.11'"]
